@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using SecureBackup.Core;
+using SecureBackup.Graphics;
 
 namespace SecureBackup
 {
@@ -8,8 +10,10 @@ namespace SecureBackup
 
         private void Initialize(object sender, StartupEventArgs args)
         {
-            // todo
+            Utilities.SetAppTheme(Utilities.GetRandomAccent());
+            new WnMain().Show();
         }
 
     }
+
 }
