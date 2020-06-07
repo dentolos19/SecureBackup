@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.0.1" />
+    <PackageReference Include="Ookii.Dialogs.Wpf.NETCore" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,20 +2,20 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mahApps="http://metro.mahapps.com/winfx/xaml/controls"
-        Title="SecureBackup">
+        Title="SecureBackup" Loaded="LoadBackups">
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" Height="50" Background="#FF444444">
             <Image DockPanel.Dock="Left" Margin="10,10,10,10" Width="30" Source="/Resources/Logo.png"/>
-            <Button DockPanel.Dock="Right" Margin="10,10,10,10" Width="75" Content="Exit"/>
-            <Button DockPanel.Dock="Right" Margin="10,10,0,10" Width="100" Content="Delete Backup"/>
-            <Button DockPanel.Dock="Right" Margin="10,10,0,10" Width="100" Content="Create Backup"/>
+            <Button DockPanel.Dock="Right" Margin="10,10,10,10" Width="75" Content="Exit" Click="Exit"/>
+            <Button x:Name="BnDeleteBackup" DockPanel.Dock="Right" Margin="10,10,0,10" Width="100" Content="Delete Backup" IsEnabled="False" Click="DeleteBackup"/>
+            <Button DockPanel.Dock="Right" Margin="10,10,0,10" Width="100" Content="Create Backup" Click="CreateBackup"/>
             <Label Margin="0,10,0,10" Content="SecureBackup" VerticalContentAlignment="Center"/>
         </DockPanel>
-        <ListView x:Name="LvBackups">
+        <ListView x:Name="LvBackups" SelectionChanged="UpdateSelected" MouseDoubleClick="OpenBackup">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" Width="200" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Creation Date" Width="150" DisplayMemberBinding="{Binding Date}"/>
+                    <GridViewColumn Header="Creation Date" Width="150" DisplayMemberBinding="{Binding Location}"/>
                 </GridView>
             </ListView.View>
         </ListView>
