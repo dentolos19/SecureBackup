@@ -1,8 +1,8 @@
 ﻿<mahApps:MetroWindow x:Class="SecureBackup.Graphics.WnMain"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mahApps="http://metro.mahapps.com/winfx/xaml/controls"
-        Title="SecureBackup" Loaded="LoadBackups">
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mahApps="http://metro.mahapps.com/winfx/xaml/controls"
+                     Title="SecureBackup" Loaded="LoadBackups">
     <DockPanel>
         <DockPanel DockPanel.Dock="Top" Height="50" Background="#FF444444">
             <Image DockPanel.Dock="Left" Margin="10,10,10,10" Width="30" Source="/Resources/Logo.png"/>

@@ -33,7 +33,7 @@ namespace SecureBackup.Graphics
             var dialog = new VistaFolderBrowserDialog { ShowNewFolderButton = true };
             if (dialog.ShowDialog() == false)
                 return;
-            var item = (BackupItem)LvBackups.SelectedItem;
+            var item = (BackupItem) LvBackups.SelectedItem;
             var backup = BackupPackage.Load(item.Location);
             File.WriteAllBytes(Constants.TempFilePath, backup.Data);
             ZipFile.ExtractToDirectory(Constants.TempFilePath, dialog.SelectedPath);
@@ -47,7 +47,7 @@ namespace SecureBackup.Graphics
                 return;
             if (MessageBox.Show("Are you sure that you want to delete this backup permanently.", "SecureBackup", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
-            var item = (BackupItem)LvBackups.SelectedItem;
+            var item = (BackupItem) LvBackups.SelectedItem;
             LvBackups.Items.Remove(LvBackups.SelectedItem);
             File.Delete(item.Location);
         }
@@ -57,7 +57,7 @@ namespace SecureBackup.Graphics
             var dialog = new VistaFolderBrowserDialog();
             if (dialog.ShowDialog() == false)
                 return;
-            var name = await this.ShowInputAsync("SecureBackup", "Enter a new name for your new backup.", new MetroDialogSettings { DefaultText = Path.GetFileName(dialog.SelectedPath)});
+            var name = await this.ShowInputAsync("SecureBackup", "Enter a new name for your new backup.", new MetroDialogSettings { DefaultText = Path.GetFileName(dialog.SelectedPath) });
             if (string.IsNullOrEmpty(name))
             {
                 MessageBox.Show("You must enter a name! Backup creation is cancelled.", "SecureBackup", MessageBoxButton.OK, MessageBoxImage.Stop);

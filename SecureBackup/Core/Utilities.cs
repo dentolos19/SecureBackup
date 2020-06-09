@@ -8,7 +8,7 @@ namespace SecureBackup.Core
 
     public static class Utilities
     {
-        
+
         public static string GetRandomAccent()
         {
             var accents = new[] { "Red", "Green", "Blue", "Purple", "Orange", "Lime", "Emerald", "Teal", "Cyan", "Cobalt", "Indigo", "Violet", "Pink", "Magenta", "Crimson", "Amber", "Yellow", "Brown", "Olive", "Steel", "Mauve", "Taupe", "Sienna" };
@@ -18,7 +18,7 @@ namespace SecureBackup.Core
 
         public static void SetAppTheme(string accent)
         {
-            var dictionary = new ResourceDictionary {Source = new Uri($"pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.{accent}.xaml")};
+            var dictionary = new ResourceDictionary { Source = new Uri($"pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.{accent}.xaml") };
             Application.Current.Resources.MergedDictionaries.Add(dictionary);
         }
 
@@ -41,19 +41,9 @@ namespace SecureBackup.Core
 
         public static string EncryptString(string data, string key, bool hashing = true)
         {
-            byte[] bytes;
             var buffer = Encoding.UTF8.GetBytes(data);
-            if (hashing)
-            {
-                var md5 = new MD5CryptoServiceProvider();
-                bytes = md5.ComputeHash(Encoding.UTF8.GetBytes(key));
-                md5.Clear();
-            }
-            else
-            {
-                bytes = Encoding.UTF8.GetBytes(key);
-            }
-            var provider = new TripleDESCryptoServiceProvider {Key = bytes, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7};
+            var bytes = hashing ? HashAlgorithm.Create("SHA256Managed")?.Hash : Encoding.UTF8.GetBytes(key);
+            var provider = new AesCryptoServiceProvider { Key = bytes!, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
             var transform = provider.CreateEncryptor();
             var result = transform.TransformFinalBlock(buffer, 0, buffer.Length);
             provider.Clear();
@@ -62,19 +52,9 @@ namespace SecureBackup.Core
 
         public static string DecryptString(string data, string key, bool hashing = true)
         {
-            byte[] bytes;
             var buffer = Convert.FromBase64String(data);
-            if (hashing)
-            {
-                var md5 = new MD5CryptoServiceProvider();
-                bytes = md5.ComputeHash(Encoding.UTF8.GetBytes(key));
-                md5.Clear();
-            }
-            else
-            {
-                bytes = Encoding.UTF8.GetBytes(key);
-            }
-            var provider = new TripleDESCryptoServiceProvider {Key = bytes, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7};
+            var bytes = hashing ? HashAlgorithm.Create("SHA256Managed")?.Hash : Encoding.UTF8.GetBytes(key);
+            var provider = new TripleDESCryptoServiceProvider { Key = bytes!, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
             var transform = provider.CreateDecryptor();
             var result = transform.TransformFinalBlock(buffer, 0, buffer.Length);
             provider.Clear();
