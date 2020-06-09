@@ -28,8 +28,17 @@ namespace SecureBackup.Graphics
         {
             if (LvBackups.SelectedItem == null)
                 return;
-            MessageBox.Show("This function is not implemented yet.", "SecureBackup", MessageBoxButton.OK, MessageBoxImage.Information);
-            // TODO: Implement "OpenBackup" Method Functions.
+            if (MessageBox.Show("Do you want to export the files inside this backup?", "SecureBackup", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                return;
+            var dialog = new VistaFolderBrowserDialog { ShowNewFolderButton = true };
+            if (dialog.ShowDialog() == false)
+                return;
+            var item = (BackupItem)LvBackups.SelectedItem;
+            var backup = BackupPackage.Load(item.Location);
+            File.WriteAllBytes(Constants.TempFilePath, backup.Data);
+            ZipFile.ExtractToDirectory(Constants.TempFilePath, dialog.SelectedPath);
+            File.Delete(Constants.TempFilePath);
+            MessageBox.Show("The files has been exported safely into selected directory.", "SecureBackup");
         }
 
         private void DeleteBackup(object sender, RoutedEventArgs args)
@@ -48,21 +57,26 @@ namespace SecureBackup.Graphics
             var dialog = new VistaFolderBrowserDialog();
             if (dialog.ShowDialog() == false)
                 return;
-            var name = await this.ShowInputAsync("SecureBackup", "Enter a new name for your new backup.");
-            if (name.Length !> 0)
+            var name = await this.ShowInputAsync("SecureBackup", "Enter a new name for your new backup.", new MetroDialogSettings { DefaultText = Path.GetFileName(dialog.SelectedPath)});
+            if (string.IsNullOrEmpty(name))
             {
                 MessageBox.Show("You must enter a name! Backup creation is cancelled.", "SecureBackup", MessageBoxButton.OK, MessageBoxImage.Stop);
                 return;
             }
+            if (File.Exists(Path.Combine(Constants.BackupsFolderPath, $"{name}.sbu")))
+            {
+                MessageBox.Show("Name already existed! Backup creation is cancelled.", "SecureBackup", MessageBoxButton.OK, MessageBoxImage.Stop);
+                return;
+            }
             var password = await this.ShowInputAsync("SecureBackup", "Enter a new password for your new backup.");
-            if (password.Length !> 7)
+            if (!(password.Length > 7))
             {
                 MessageBox.Show("Your password must be longer than 7 characters! Backup creation is cancelled.", "SecureBackup", MessageBoxButton.OK, MessageBoxImage.Stop);
                 return;
             }
-            ZipFile.CreateFromDirectory(dialog.SelectedPath, Constants.NewBackupTempFilePath);
-            var backup = new BackupPackage(password, await File.ReadAllBytesAsync(Constants.NewBackupTempFilePath));
-            File.Delete(Constants.NewBackupTempFilePath);
+            ZipFile.CreateFromDirectory(dialog.SelectedPath!, Constants.TempFilePath);
+            var backup = new BackupPackage { Password = password, Data = await File.ReadAllBytesAsync(Constants.TempFilePath) };
+            File.Delete(Constants.TempFilePath);
             backup.Save(Path.Combine(Constants.BackupsFolderPath, $"{name}.sbu"));
             RefreshBackups();
         }
@@ -77,7 +91,7 @@ namespace SecureBackup.Graphics
             LvBackups.Items.Clear();
             var backups = Directory.GetFiles(Constants.BackupsFolderPath);
             foreach (var backup in backups)
-                LvBackups.Items.Add(new BackupItem(Path.GetFileName(backup), backup));
+                LvBackups.Items.Add(new BackupItem(Path.GetFileNameWithoutExtension(backup), backup));
         }
 
         private void Exit(object sender, RoutedEventArgs args)

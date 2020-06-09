@@ -13,12 +13,6 @@ namespace SecureBackup.Core.Models
 
         public byte[] Data { get; set; }
 
-        public BackupPackage(string password = null, byte[] data = null)
-        {
-            Password = password;
-            Data = data;
-        }
-
         public void Save(string output)
         {
             var originalPassword = Password;
