@@ -54,7 +54,7 @@ namespace SecureBackup.Core
         {
             var buffer = Convert.FromBase64String(data);
             var bytes = hashing ? HashAlgorithm.Create("SHA256Managed")?.Hash : Encoding.UTF8.GetBytes(key);
-            var provider = new TripleDESCryptoServiceProvider { Key = bytes!, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
+            var provider = new AesCryptoServiceProvider { Key = bytes!, Mode = CipherMode.ECB, Padding = PaddingMode.PKCS7 };
             var transform = provider.CreateDecryptor();
             var result = transform.TransformFinalBlock(buffer, 0, buffer.Length);
             provider.Clear();
