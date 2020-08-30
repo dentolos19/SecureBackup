@@ -7,6 +7,7 @@ using SecureBackup.Core.Bindings;
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 using AdonisMessageBoxButton = AdonisUI.Controls.MessageBoxButton;
 using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
+using MessageBoxImage = AdonisUI.Controls.MessageBoxImage;
 
 namespace SecureBackup.Graphics
 {
@@ -28,7 +29,7 @@ namespace SecureBackup.Graphics
 
         private void DeleteBackup(object sender, RoutedEventArgs args)
         {
-            var result = AdonisMessageBox.Show("Are you sure that you want to delete this backup? This is irreversible!", "SecureBackup", AdonisMessageBoxButton.YesNo);
+            var result = AdonisMessageBox.Show("Are you sure that you want to delete this backup? This is irreversible!", "SecureBackup", AdonisMessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result != AdonisMessageBoxResult.Yes)
                 return;
             var item = (BackupItemBinding)BackupList.SelectedItem;
