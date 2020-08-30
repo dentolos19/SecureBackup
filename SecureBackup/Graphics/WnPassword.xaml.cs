@@ -20,7 +20,7 @@ namespace SecureBackup.Graphics
         {
             if (PasswordText.Password.Length < 8)
             {
-                AdonisMessageBox.Show("Your password must be at least 8 characters long!", "SecureBackup", AdonisMessageBoxButton.OK, AdonisMessageBoxImage.Exclamation);
+                AdonisMessageBox.Show("The password must be at least 8 characters long!", "SecureBackup", AdonisMessageBoxButton.OK, AdonisMessageBoxImage.Exclamation);
                 return;
             }
             PasswordResult = PasswordText.Password;

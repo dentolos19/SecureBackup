@@ -50,7 +50,7 @@ namespace SecureBackup.Graphics
             backup.BackupName = NameText.Text;
             backup.FromLocation = SourceText.Text;
             backup.BackupTime = DateTime.Now;
-            backup.Data = Convert.ToBase64String(File.ReadAllBytes(archivePath));
+            backup.Data = Cryptography.EncryptData(Convert.ToBase64String(File.ReadAllBytes(archivePath)), Utilities.FixPasswordLength(PasswordText.Password));
             backup.Save(Path.Combine(Constants.BackupsPath, Utilities.GenerateAlphanumeric(16) + ".sbu"));
             File.Delete(archivePath);
             DialogResult = true;
