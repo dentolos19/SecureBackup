@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml.Serialization;
 
 namespace SecureBackup.Core.Models
@@ -15,7 +16,7 @@ namespace SecureBackup.Core.Models
 
         public string Data { get; set; }
 
-        public string BackupTime { get; set; }
+        public DateTime BackupTime { get; set; }
 
         public void Save(string outputPath)
         {

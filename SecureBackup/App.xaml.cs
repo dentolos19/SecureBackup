@@ -10,7 +10,7 @@ namespace SecureBackup
     public partial class App
     {
 
-        private void Initialize(object sender, StartupEventArgs args)
+        private void InitializeApp(object sender, StartupEventArgs args)
         {
             if (!Directory.Exists(Constants.BackupsPath))
                 Directory.CreateDirectory(Constants.BackupsPath);
@@ -19,7 +19,8 @@ namespace SecureBackup
 
         private void HandleException(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
-            // TODO
+            new WnException(args.Exception).ShowDialog();
+            args.Handled = true;
         }
 
     }

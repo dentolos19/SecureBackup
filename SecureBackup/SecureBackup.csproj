@@ -20,6 +20,7 @@
   <ItemGroup>
     <PackageReference Include="AdonisUI" Version="1.16.0" />
     <PackageReference Include="AdonisUI.ClassicTheme" Version="1.16.0" />
+    <PackageReference Include="Ookii.Dialogs.Wpf.NETCore" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

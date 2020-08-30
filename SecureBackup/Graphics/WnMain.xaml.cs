@@ -1,13 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.IO.Compression;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
+using Ookii.Dialogs.Wpf;
 using SecureBackup.Core;
 using SecureBackup.Core.Bindings;
+using SecureBackup.Core.Models;
 using AdonisMessageBox = AdonisUI.Controls.MessageBox;
 using AdonisMessageBoxButton = AdonisUI.Controls.MessageBoxButton;
 using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
-using MessageBoxImage = AdonisUI.Controls.MessageBoxImage;
+using AdonisMessageBoxImage = AdonisUI.Controls.MessageBoxImage;
 
 namespace SecureBackup.Graphics
 {
@@ -24,12 +28,14 @@ namespace SecureBackup.Graphics
 
         private void CreateBackup(object sender, RoutedEventArgs args)
         {
-            // TODO
+            var dialog = new WnCreate { Owner = this };
+            if (dialog.ShowDialog() == true)
+                RefreshBackup(null, null);
         }
 
         private void DeleteBackup(object sender, RoutedEventArgs args)
         {
-            var result = AdonisMessageBox.Show("Are you sure that you want to delete this backup? This is irreversible!", "SecureBackup", AdonisMessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = AdonisMessageBox.Show("Are you sure that you want to delete this backup? This is irreversible!", "SecureBackup", AdonisMessageBoxButton.YesNo, AdonisMessageBoxImage.Warning);
             if (result != AdonisMessageBoxResult.Yes)
                 return;
             var item = (BackupItemBinding)BackupList.SelectedItem;
@@ -39,7 +45,34 @@ namespace SecureBackup.Graphics
 
         private void RestoreBackup(object sender, RoutedEventArgs args)
         {
-            // TODO
+            var passwordDialog = new WnPassword { Owner = this };
+            if (passwordDialog.ShowDialog() != true)
+                return;
+            var item = (BackupItemBinding)BackupList.SelectedItem;
+            var backup = BackupModel.Load(item.DataLocation);
+            var unlocked = Cryptography.DecryptData(backup.Data, Utilities.FixPasswordLength(passwordDialog.PasswordResult), out var data);
+            if (!unlocked)
+            {
+                AdonisMessageBox.Show("You entered the wrong password!", "SecureBackup", AdonisMessageBoxButton.OK, AdonisMessageBoxImage.Exclamation);
+                return;
+            }
+            var archivePath = Path.Combine(Path.GetTempPath(), Utilities.GenerateAlphanumeric(16) + ".sbz");
+            File.WriteAllBytes(archivePath, Convert.FromBase64String(data));
+            var result = AdonisMessageBox.Show("Do you want to restore the backup to its original location? Choose otherwise to select a different location.", "SecurePad", AdonisMessageBoxButton.YesNo, AdonisMessageBoxImage.Question);
+            if (result == AdonisMessageBoxResult.Yes)
+            {
+                if (!Directory.Exists(item.FromLocation))
+                    Directory.CreateDirectory(item.FromLocation);
+                ZipFile.ExtractToDirectory(archivePath, item.FromLocation, true);
+            }
+            else
+            {
+                var folderDialog = new VistaFolderBrowserDialog { ShowNewFolderButton = true };
+                if (folderDialog.ShowDialog() == true)
+                    ZipFile.ExtractToDirectory(archivePath, folderDialog.SelectedPath);
+            }
+            File.Delete(archivePath);
+            AdonisMessageBox.Show("Restored backup! Thank you for using SecureBackup!", "SecureBackup", AdonisMessageBoxButton.OK, AdonisMessageBoxImage.Information);
         }
 
         private void RefreshBackup(object sender, RoutedEventArgs args)
@@ -54,7 +87,7 @@ namespace SecureBackup.Graphics
             var dialog = new OpenFileDialog { Filter = "SecureBackup|*.sbu" };
             if (dialog.ShowDialog() == true)
             {
-                File.Copy(dialog.FileName, Path.Combine(Constants.BackupsPath, Utilities.GenerateAlphanumeric(8) + ".sbu"));
+                File.Copy(dialog.FileName, Path.Combine(Constants.BackupsPath, Utilities.GenerateAlphanumeric(16) + ".sbu"));
                 RefreshBackup(null, null);
             }
         }

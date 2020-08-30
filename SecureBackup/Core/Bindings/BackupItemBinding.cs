@@ -1,4 +1,5 @@
-﻿using SecureBackup.Core.Models;
+﻿using System.Globalization;
+using SecureBackup.Core.Models;
 
 namespace SecureBackup.Core.Bindings
 {
@@ -22,7 +23,7 @@ namespace SecureBackup.Core.Bindings
                 BackupName = backup.BackupName,
                 FromLocation = backup.FromLocation,
                 DataLocation = backupPath,
-                BackupTime = backup.BackupTime
+                BackupTime = backup.BackupTime.ToString(CultureInfo.CurrentCulture)
             };
         }
 

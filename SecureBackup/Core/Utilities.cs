@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Windows;
 
 namespace SecureBackup.Core
 {
@@ -24,6 +28,15 @@ namespace SecureBackup.Core
             for (var index = 0; index < charsNeeded; index++)
                 password += "X";
             return password;
+        }
+
+        public static void RestartApp(string args = null)
+        {
+            var location = Assembly.GetExecutingAssembly().Location;
+            if (location.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+                location = Path.Combine(Path.GetDirectoryName(location)!, Path.GetFileNameWithoutExtension(location) + ".exe");
+            Process.Start(location, args ?? string.Empty);
+            Application.Current.Shutdown();
         }
 
     }
