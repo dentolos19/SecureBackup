@@ -1,12 +1,12 @@
 ﻿using System.IO;
-using System.IO.Compression;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using MahApps.Metro.Controls.Dialogs;
-using Ookii.Dialogs.Wpf;
+using Microsoft.Win32;
 using SecureBackup.Core;
-using SecureBackup.Core.Models;
+using SecureBackup.Core.Bindings;
+using AdonisMessageBox = AdonisUI.Controls.MessageBox;
+using AdonisMessageBoxButton = AdonisUI.Controls.MessageBoxButton;
+using AdonisMessageBoxResult = AdonisUI.Controls.MessageBoxResult;
 
 namespace SecureBackup.Graphics
 {
@@ -17,86 +17,69 @@ namespace SecureBackup.Graphics
         public WnMain()
         {
             InitializeComponent();
+            RefreshBackup(null, null);
+            UpdateSelection(null, null);
         }
 
-        private void UpdateSelected(object sender, SelectionChangedEventArgs args)
+        private void CreateBackup(object sender, RoutedEventArgs args)
         {
-            BnDeleteBackup.IsEnabled = LvBackups.SelectedItem != null;
-        }
-
-        private void OpenBackup(object sender, MouseButtonEventArgs args)
-        {
-            if (LvBackups.SelectedItem == null)
-                return;
-            if (MessageBox.Show("Do you want to export the files inside this backup?", "SecureBackup", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-                return;
-            var dialog = new VistaFolderBrowserDialog { ShowNewFolderButton = true };
-            if (dialog.ShowDialog() == false)
-                return;
-            var item = (BackupItem) LvBackups.SelectedItem;
-            var backup = BackupPackage.Load(item.Location);
-            File.WriteAllBytes(Constants.TempFilePath, backup.Data);
-            ZipFile.ExtractToDirectory(Constants.TempFilePath, dialog.SelectedPath);
-            File.Delete(Constants.TempFilePath);
-            MessageBox.Show("The files has been exported safely into selected directory.", "SecureBackup");
+            // TODO
         }
 
         private void DeleteBackup(object sender, RoutedEventArgs args)
         {
-            if (BnDeleteBackup.IsEnabled == false)
+            var result = AdonisMessageBox.Show("Are you sure that you want to delete this backup? This is irreversible!", "SecureBackup", AdonisMessageBoxButton.YesNo);
+            if (result != AdonisMessageBoxResult.Yes)
                 return;
-            if (MessageBox.Show("Are you sure that you want to delete this backup permanently.", "SecureBackup", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-                return;
-            var item = (BackupItem) LvBackups.SelectedItem;
-            LvBackups.Items.Remove(LvBackups.SelectedItem);
-            File.Delete(item.Location);
+            var item = (BackupItemBinding)BackupList.SelectedItem;
+            File.Delete(item.DataLocation);
+            RefreshBackup(null, null);
         }
 
-        private async void CreateBackup(object sender, RoutedEventArgs args)
+        private void RestoreBackup(object sender, RoutedEventArgs args)
         {
-            var dialog = new VistaFolderBrowserDialog();
-            if (dialog.ShowDialog() == false)
-                return;
-            var name = await this.ShowInputAsync("SecureBackup", "Enter a new name for your new backup.", new MetroDialogSettings { DefaultText = Path.GetFileName(dialog.SelectedPath) });
-            if (string.IsNullOrEmpty(name))
+            // TODO
+        }
+
+        private void RefreshBackup(object sender, RoutedEventArgs args)
+        {
+            BackupList.Items.Clear();
+            foreach (var backupPath in Directory.GetFiles(Constants.BackupsPath, "*.sbu"))
+                BackupList.Items.Add(BackupItemBinding.Create(backupPath));
+        }
+
+        private void ImportBackup(object sender, RoutedEventArgs args)
+        {
+            var dialog = new OpenFileDialog { Filter = "SecureBackup|*.sbu" };
+            if (dialog.ShowDialog() == true)
             {
-                MessageBox.Show("You must enter a name! Backup creation is cancelled.", "SecureBackup", MessageBoxButton.OK, MessageBoxImage.Stop);
-                return;
+                File.Copy(dialog.FileName, Path.Combine(Constants.BackupsPath, Utilities.GenerateAlphanumeric(8) + ".sbu"));
+                RefreshBackup(null, null);
             }
-            if (File.Exists(Path.Combine(Constants.BackupsFolderPath, $"{name}.sbu")))
+        }
+
+        private void ExportBackup(object sender, RoutedEventArgs args)
+        {
+            var backup = (BackupItemBinding)BackupList.SelectedItem;
+            var dialog = new SaveFileDialog { Filter = "SecureBackup|*.sbu", FileName = backup.BackupName };
+            if (dialog.ShowDialog() == true)
+                File.Copy(backup.DataLocation, dialog.FileName, true);
+        }
+
+        private void UpdateSelection(object sender, SelectionChangedEventArgs args)
+        {
+            if (BackupList.SelectedItem == null)
             {
-                MessageBox.Show("Name already existed! Backup creation is cancelled.", "SecureBackup", MessageBoxButton.OK, MessageBoxImage.Stop);
-                return;
+                DeleteButton.IsEnabled = false;
+                RestoreButton.IsEnabled = false;
+                ExportButton.IsEnabled = false;
             }
-            var password = await this.ShowInputAsync("SecureBackup", "Enter a new password for your new backup.");
-            if (!(password.Length > 7))
+            else
             {
-                MessageBox.Show("Your password must be longer than 7 characters! Backup creation is cancelled.", "SecureBackup", MessageBoxButton.OK, MessageBoxImage.Stop);
-                return;
+                DeleteButton.IsEnabled = true;
+                RestoreButton.IsEnabled = true;
+                ExportButton.IsEnabled = true;
             }
-            ZipFile.CreateFromDirectory(dialog.SelectedPath!, Constants.TempFilePath);
-            var backup = new BackupPackage { Password = password, Data = await File.ReadAllBytesAsync(Constants.TempFilePath) };
-            File.Delete(Constants.TempFilePath);
-            backup.Save(Path.Combine(Constants.BackupsFolderPath, $"{name}.sbu"));
-            RefreshBackups();
-        }
-
-        private void LoadBackups(object sender, RoutedEventArgs rgs)
-        {
-            RefreshBackups();
-        }
-
-        private void RefreshBackups()
-        {
-            LvBackups.Items.Clear();
-            var backups = Directory.GetFiles(Constants.BackupsFolderPath);
-            foreach (var backup in backups)
-                LvBackups.Items.Add(new BackupItem(Path.GetFileNameWithoutExtension(backup), backup));
-        }
-
-        private void Exit(object sender, RoutedEventArgs args)
-        {
-            Application.Current.Shutdown();
         }
 
     }

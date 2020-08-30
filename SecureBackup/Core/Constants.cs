@@ -7,8 +7,7 @@ namespace SecureBackup.Core
     public static class Constants
     {
 
-        public static readonly string BackupsFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backups");
-        public static readonly string TempFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SecureBackup.tmp");
+        public static string BackupsPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "Backups");
 
     }
 

@@ -11,9 +11,8 @@ namespace SecureBackup
 
         private void Initialize(object sender, StartupEventArgs args)
         {
-            if (!Directory.Exists(Constants.BackupsFolderPath))
-                Directory.CreateDirectory(Constants.BackupsFolderPath);
-            Utilities.SetAppTheme(Utilities.GetRandomAccent());
+            if (!Directory.Exists(Constants.BackupsPath))
+                Directory.CreateDirectory(Constants.BackupsPath);
             new WnMain().Show();
         }
 
