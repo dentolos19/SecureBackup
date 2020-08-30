@@ -68,8 +68,9 @@ namespace SecureBackup.Graphics
             else
             {
                 var folderDialog = new VistaFolderBrowserDialog { ShowNewFolderButton = true };
-                if (folderDialog.ShowDialog() == true)
-                    ZipFile.ExtractToDirectory(archivePath, folderDialog.SelectedPath);
+                if (folderDialog.ShowDialog() == false)
+                    return;
+                ZipFile.ExtractToDirectory(archivePath, folderDialog.SelectedPath);
             }
             File.Delete(archivePath);
             AdonisMessageBox.Show("Restored backup! Thank you for using SecureBackup!", "SecureBackup", AdonisMessageBoxButton.OK, AdonisMessageBoxImage.Information);
