@@ -1,13 +1,20 @@
-# SecureBackup
+<h1 align="center">
+  <br>
+    <img src="./.github/icon.png" width="200">
+  <br>
+    SecureBackup
+  <br>
+</h1>
 
-This is a very simple tool for backing up your files securely with password. It is recommended that you install and place this program onto a USB drive for better safety for your backups, so just in case your PC won't work then your files are still safe. I made this project just for the learning experience and any contributions will be helpful thanks!
+<p align="center">
+  <a>
+    <img src="https://badgen.net/badge/icon/Windows%20%7C%20.NET%20Core%203.1?icon=windows&label">
+  </a>
+  <a>
+    <img src="https://badgen.net/badge/icon/Visual%20Studio%202019?icon=visualstudio&label">
+  </a>
+</p>
 
-![Preview](https://dentolos19.github.io/previews/securebackup.png)
+## Screenshots
 
-### Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-### License
-
-This project is licensed with the [MIT License](https://choosealicense.com/licenses/mit).
+![](./.github/screenshots/0.png)
